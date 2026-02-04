@@ -1,34 +1,58 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import api from './api/axios'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [response, setResponse] = useState(null)
+  const [error, setError] = useState(null)
+
+  const handleCorsTest = async () => {
+    try {
+      setError(null)
+      setResponse(null)
+      
+      const payload = {
+        email: "user@example.com",
+        nickname: "test_user",
+        profileImageUrl: "https://example.com/profile.jpg",
+        industryId: 1,
+        jobCategoryId: 1
+      }
+
+      console.log('Sending POST /user/signup with:', payload)
+      
+      const res = await api.post('/user/signup', payload); 
+      setResponse(res.data)
+      console.log('Response:', res)
+    } catch (err) {
+      console.error('Error:', err)
+      setError(err.message || 'An error occurred')
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <div className="container">
+      <h1>CORS Test</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={handleCorsTest}>
+          POST /user/signup
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      
+      {response && (
+        <div className="result success">
+          <h3>Response Data:</h3>
+          <pre>{JSON.stringify(response, null, 2)}</pre>
+        </div>
+      )}
+
+      {error && (
+        <div className="result error">
+          <h3>Error:</h3>
+          <pre>{error}</pre>
+        </div>
+      )}
+    </div>
   )
 }
 
